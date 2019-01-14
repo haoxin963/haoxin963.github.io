@@ -215,10 +215,10 @@
             }
             ((BeanFactoryAware) bean).setBeanFactory(this);
         }
-</code></pre><p> //省略其他代码</p>
-<pre><code>}
+     //省略其他代码
+}
 </code></pre><p>看到没有，其实很简单嘛！</p>
-<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：<em>**</em></p>
+<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：**</p>
 <pre><code>package com.pb.entity;
 
 import org.springframework.beans.factory.BeanNameAware;
@@ -258,7 +258,7 @@ public class HelloTest {
 }
 </code></pre><p>结果:</p>
 <pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init
-</code></pre><p><strong>2、</strong>BeanFactoryAware接口：<em>**</em></p>
+</code></pre><p><strong>2、</strong>BeanFactoryAware接口：**</p>
 <pre><code>package com.pb.entity;
 
 import org.springframework.beans.BeansException;

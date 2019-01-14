@@ -15,7 +15,7 @@
 <meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（八）：Aware接口/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
 <meta property="og:description" content="我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。 一、为什么需要Aware大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）">
-<meta property="og:updated_time" content="2019-01-14T08:11:23.006Z">
+<meta property="og:updated_time" content="2019-01-14T08:13:57.892Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="白话Spring源码（八）：Aware接口">
 <meta name="twitter:description" content="我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。 一、为什么需要Aware大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）">
@@ -218,10 +218,10 @@
             }
             ((BeanFactoryAware) bean).setBeanFactory(this);
         }
-</code></pre><p> //省略其他代码</p>
-<pre><code>}
+     //省略其他代码
+}
 </code></pre><p>看到没有，其实很简单嘛！</p>
-<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：<em>**</em></p>
+<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：**</p>
 <pre><code>package com.pb.entity;
 
 import org.springframework.beans.factory.BeanNameAware;
@@ -261,7 +261,7 @@ public class HelloTest {
 }
 </code></pre><p>结果:</p>
 <pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init
-</code></pre><p><strong>2、</strong>BeanFactoryAware接口：<em>**</em></p>
+</code></pre><p><strong>2、</strong>BeanFactoryAware接口：**</p>
 <pre><code>package com.pb.entity;
 
 import org.springframework.beans.BeansException;
