@@ -6,14 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>haoxin963的博客</title>
+  <title>白话Spring源码（三）：spring框架的理解 | haoxin963的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="haoxin963的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
+<meta name="keywords" content="spring源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="白话Spring源码（三）：spring框架的理解">
+<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
+<meta property="og:description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20181208153013997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-01-14T06:02:06.319Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="haoxin963的博客">
+<meta name="twitter:title" content="白话Spring源码（三）：spring框架的理解">
+<meta name="twitter:description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20181208153013997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
   
     <link rel="alternative" href="/atom.xml" title="haoxin963的博客" type="application/atom+xml">
   
@@ -143,16 +150,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-白话Spring源码（三）：spring框架的理解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-白话Spring源码（三）：spring框架的理解" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/14/白话Spring源码（三）：spring框架的理解/">白话Spring源码（三）：spring框架的理解</a>
+    <h1 class="article-title" itemprop="name">
+      白话Spring源码（三）：spring框架的理解
     </h1>
   
 
@@ -185,85 +190,26 @@
       
 
       
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/14/白话Spring源码（三）：spring框架的理解/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-白话Spring源码（二）：spring源码分享的思路" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/">白话Spring源码（二）：spring源码分享的思路</a>
-    </h1>
-  
-
-        
-        <a href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:58:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>做事先列个大纲，这样思路清晰了才不会乱。</p>
-<p>这次spring源码系列的博客每个字我都坚持自己手敲，然后文采不好，但是真实。希望大家喜欢。</p>
-<h3 id="大纲："><a href="#大纲：" class="headerlink" title="大纲："></a>大纲：</h3><p>1.spring框架的理解</p>
-<p>2.beanfactory：怎么创建bean的，怎么加载xml中bean的定义的</p>
-<p>3.AOP</p>
-<p>4.applicationContext</p>
-<p>下面的等我想好了再补充</p>
-
-      
-
       
     </div>
     <div class="article-info article-info-index">
@@ -283,16 +229,75 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">白话Spring源码（二）：spring源码分享的思路</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -312,250 +317,32 @@
 
 
 
-
   
-    <article id="post-白话Spring源码（一）：怎么阅读源码" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
+
     
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/">白话Spring源码（一）：怎么阅读源码</a>
-    </h1>
+ 
   
 
-        
-        <a href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:48:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>跟大家分享Spring源码前我想先聊聊：</p>
-<p>为什么要阅读源码？</p>
-<p>怎么阅读源码？</p>
-<p>希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。</p>
-<h3 id="一、为什么要阅读源码"><a href="#一、为什么要阅读源码" class="headerlink" title="一、为什么要阅读源码"></a>一、为什么要阅读源码</h3><p>刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东西也很少，而且现在框架也越来越强大，甚至配置文件都不需要，这样我们跟刚入行的小白比技术上又有多大优势呢？</p>
-<p>其实阅读源码是提升我们技术的一大法宝，我们知道源码都是一些大师级的人写的，无论是他们对问题的抽象，代码的规范，设计模式的运用等都是教科书级的，我们可以从源码中学到他们是怎么思考问题，怎么去抽象，怎么去设计接口，怎么像写诗一样写代码等等，然后我们试着的学以致用，技术自然就提高了。</p>
-<h3 id="二、怎么阅读源码"><a href="#二、怎么阅读源码" class="headerlink" title="二、怎么阅读源码"></a>二、怎么阅读源码</h3><p>我相信大家刚接触源码是肯定有这种感觉：哇！这代码量太大了吧,这调用层次太深了吧，这从哪开始读啊。。。。</p>
-<p>其实我也困惑也很多，其实阅读源码也需要一些技巧的，下面跟大家分享一下：</p>
-<p>1.先会使用他，越熟悉越好，如果都不知道它干嘛的，你读什么源码呀</p>
-<p>2.对框架里的架构和概念有一些了解，这网上一堆，但是很多概念都很难理解，其实这是都是商业宣传搞的鬼，不吹会死啊</p>
-<p>3.能到程序的入口或者带着问题去阅读，其实源码都是有junit的测试用例的，这是很好的入口噢</p>
-<p>4.最好阅读最初的版本，因为刚开始版本的都是精华，代码量很少，以后的版本大都是丰富功能，增加稳定性，但是万变不离其宗，我们知道了核心的思想，阅读以后的版本也就很轻松了。</p>
-<p>5.分享，分享对学习的动力，与他人分享也能发挥我们的价值。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-sky微服务接口平台上线" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/14/sky微服务接口平台上线/">sky平台</a>
-    </h1>
   
 
-        
-        <a href="/2019/01/14/sky微服务接口平台上线/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:25:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>sky平台是基于spring cloud的微服务接口开发平台，平台的目标是在高并发，大数据场景下支持水平扩展和服务高可靠，高可用。</p>
-<p>平台包含API网关、统一权限认证、前后端代码生成，数据上传分库分表等多个模块，可以作为后端接口的开发脚手架或微服务学习入门框架。</p>
-<h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><ul>
-<li>如果对您对此项目有兴趣，可以点 “Star” 支持一下 谢谢！ ^_^</li>
-<li>或者您可以 “follow” 一下，我会不断开源更多的有趣的项目</li>
-<li>如有问题请直接在 Issues 中提，或者您发现问题并有非常好的解决方案，欢迎 PR</li>
-<li>QQ交流群：428135328</li>
-</ul>
-<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><h3 id="码云："><a href="#码云：" class="headerlink" title="码云："></a>码云：</h3><ul>
-<li>后台：<a href="https://gitee.com/haoxin963/sky" target="_blank" rel="noopener">https://gitee.com/haoxin963/sky</a></li>
-<li>前端ui：<a href="https://gitee.com/haoxin963/sky-ui" target="_blank" rel="noopener">https://gitee.com/haoxin963/sky-ui</a></li>
-<li>配置git：<a href="https://gitee.com/haoxin963/sky-config" target="_blank" rel="noopener">https://gitee.com/haoxin963/sky-config</a></li>
-</ul>
-<h3 id="github："><a href="#github：" class="headerlink" title="github："></a>github：</h3><ul>
-<li>后台：<a href="https://github.com/haoxin963/sky" target="_blank" rel="noopener">https://github.com/haoxin963/sky</a></li>
-<li>前端ui：<a href="https://github.com/haoxin963/sky-ui" target="_blank" rel="noopener">https://github.com/haoxin963/sky-ui</a></li>
-<li>配置git：<a href="https://github.com/haoxin963/sky-config" target="_blank" rel="noopener">https://github.com/haoxin963/sky-config</a></li>
-</ul>
-<h2 id="功能列表"><a href="#功能列表" class="headerlink" title="功能列表"></a>功能列表</h2><ul>
-<li>服务注册发现：使用Eureka实现</li>
-<li>配置文件：git和消息总线实现动态实时刷新</li>
-<li>统一网关：支持多端流量控制的zuul网关服务</li>
-<li>服务鉴权：oauth2.0+JWT统一权限认证</li>
-<li>负载均衡及熔断：Feig+Hystrix</li>
-<li>服务监控: SpringBootAdmin监控服务状态</li>
-<li>链路追踪： zipkin链路图形化展示</li>
-<li>代码生成 ：可生成java代码和前端vue代码，单表CURD基本不需要编码</li>
-<li>用户管理：rbac用户权限角色管理</li>
-<li>分库分表：基于shardingdbc分库分表</li>
-<li>分布式锁：Redis+Redisson实现分布式锁</li>
-<li>分布式事务：lcn分布式事务</li>
-<li>分布式ID：Twitter的snowflake算法</li>
-<li>接口文档：使用swagger文档管理</li>
-<li>缓存服务：RedisTemplate+SpringCache</li>
-<li>消息服务：阿里鱼的短信服务</li>
-<li>日志管理，支持日保存ELK，图形化展示</li>
-<li>部署发布：使用docker+jenkins自动发布</li>
-<li>分布式任务调度：基于zookeeper的elastic-job实现</li>
-</ul>
-<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><p>sky<br>├── sky-base – 基础模块<br>├    ├── sky-auth – 统一权限中心<br>├    ├── sky-common – 公共模块<br>├    ├── sky-mc-service – 消息中心模块<br>├    ├── sky-elastic-job – 分布式任务调度模块<br>├    └── sky-tx-client – 分布式事务客户端模块<br>├    └── sky-tx-manager – 分布式事务协调模块<br>├── sky-control – spring cloud服务模块<br>├    ├── sky-config – 配置中心<br>├    ├── sky-eureka – 服务注册发现<br>├    ├── sky-monitor – 服务监控<br>├    └── sky-zipkin – zipkin监控模块<br>├    └── sky-zuul – 网关服务<br>└── sky-modules  – 业务模块<br>├    ├── sky-rbac-service – 用户权限模块<br>├    ├── sky-record-api – demo-记录接口<br>├    └── sky-record-service – demo-记录服务</p>
-<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p><img src="https://images.gitee.com/uploads/images/2018/1104/203305_15a39046_1207662.png" alt="架构"></p>
-<h2 id="核心技术"><a href="#核心技术" class="headerlink" title="核心技术"></a>核心技术</h2><ul>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/82217548" target="_blank" rel="noopener">Spring Cloud</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/83351979" target="_blank" rel="noopener">RabbitMQ</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/83141487" target="_blank" rel="noopener">Redis</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/82859487" target="_blank" rel="noopener">OAuth2.0</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/82860284" target="_blank" rel="noopener">JWT</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/83098510" target="_blank" rel="noopener">分布式锁</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/83098885" target="_blank" rel="noopener">分布式ID</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/81777348" target="_blank" rel="noopener">分布式事务</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/81906667" target="_blank" rel="noopener">docker</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/81870545" target="_blank" rel="noopener">jenkins</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/details/81506817" target="_blank" rel="noopener">ELK</a></li>
-<li><a href="https://blog.csdn.net/haoxin963/article/category/8239099" target="_blank" rel="noopener">ZooKeeper</a></li>
-</ul>
-<h2 id="启动说明"><a href="#启动说明" class="headerlink" title="启动说明"></a>启动说明</h2><h3 id="环境及工具"><a href="#环境及工具" class="headerlink" title="环境及工具"></a>环境及工具</h3><ul>
-<li>JDK: 1.8+</li>
-<li>MAVEN: 3.3+</li>
-<li>MYSQL: 5.7+</li>
-<li>Redis: 3.0+</li>
-<li>RabbitMQ：3.7+</li>
-<li>IDEA 2018(需要安装Lombok插件)</li>
-<li>Postman</li>
-</ul>
-<h3 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h3><ul>
-<li>sky-eureka</li>
-<li>sky-config</li>
-<li>sky-rbac-service</li>
-<li>sky-auth</li>
-<li>sky-zuul</li>
-<li>其他模块</li>
-</ul>
-<h3 id="docker-jenkins部署"><a href="#docker-jenkins部署" class="headerlink" title="docker+jenkins部署"></a>docker+jenkins部署</h3><p>欢迎进群交流：428135328(QQ群)</p>
-<h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><h3 id="前端页面"><a href="#前端页面" class="headerlink" title="前端页面"></a>前端页面</h3><p><img src="https://images.gitee.com/uploads/images/2018/1116/111416_99b7e725_1207662.png" alt="输入图片说明"><img src="https://images.gitee.com/uploads/images/2018/1116/111430_f9514e3f_1207662.png" alt="输入图片说明"></p>
-<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><p>使用Postman调用接口</p>
-<ul>
-<li>1.用户注册 URL：<a href="http://localhost:9999/restApi/record/registerUser" target="_blank" rel="noopener">http://localhost:9999/restApi/record/registerUser</a> <img src="https://images.gitee.com/uploads/images/2018/1030/135018_21174675_1207662.png" alt="用户注册"></li>
-<li>2.获取Token URL：<a href="http://localhost:9999/auth/oauth/token" target="_blank" rel="noopener">http://localhost:9999/auth/oauth/token</a> <img src="https://images.gitee.com/uploads/images/2018/1030/135056_5b1387f9_1207662.png" alt="获取Token"></li>
-<li>3.上传记录 URL：<a href="http://localhost:9999/restApi/record/addRecord" target="_blank" rel="noopener">http://localhost:9999/restApi/record/addRecord</a> <img src="https://images.gitee.com/uploads/images/2018/1030/135113_6abca477_1207662.png" alt="上传记录"></li>
-<li>4.分页查询 URL：<a href="http://localhost:9999/restApi/record/2/page" target="_blank" rel="noopener">http://localhost:9999/restApi/record/2/page</a> <img src="https://images.gitee.com/uploads/images/2018/1030/135138_087dfcb6_1207662.png" alt="分页查询"></li>
-<li>5.详情查询 URL：<a href="http://localhost:9999/restApi/record/2/505425581337214976" target="_blank" rel="noopener">http://localhost:9999/restApi/record/2/505425581337214976</a> <img src="https://images.gitee.com/uploads/images/2018/1030/135155_a1dae00c_1207662.png" alt="详情查询"></li>
-</ul>
-<p>接口详细调用demo:<a href="https://blog.csdn.net/haoxin963/article/details/83512953" target="_blank" rel="noopener">查看</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">sky平台</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/14/sky微服务接口平台上线/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
+  
 
   
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://billts.site/extra_css/gitment.css">
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/",
+  owner: 'haoxin963',
+  repo: 'haoxin963.github.io',
+  oauth: {
+    client_id: '122ffb2d712f40efbf52',
+    client_secret: '0ee50381131e30c83fab491ee728542fac43cef4',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
   
 
 
@@ -578,8 +365,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
