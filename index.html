@@ -145,6 +145,229 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-白话Spring源码（八）：Aware接口" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/14/白话Spring源码（八）：Aware接口/">白话Spring源码（八）：Aware接口</a>
+    </h1>
+  
+
+        
+        <a href="/2019/01/14/白话Spring源码（八）：Aware接口/" class="archive-article-date">
+  	<time datetime="2019-01-14T08:08:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。</p>
+<h3 id="一、为什么需要Aware"><a href="#一、为什么需要Aware" class="headerlink" title="一、为什么需要Aware"></a>一、为什么需要Aware</h3><p>大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）中沉睡。所以，本节的目的就是要创造出一个尼奥一样的Bean，让他知道自己在工厂中的id和自己原来躺在哪个工厂中。</p>
+<p>这里，称之为，<strong>Bean对Spring有知觉（Aware翻译过来就是知觉）。</strong></p>
+<h3 id="二、Aware是怎么实现的"><a href="#二、Aware是怎么实现的" class="headerlink" title="二、Aware是怎么实现的"></a>二、Aware是怎么实现的</h3><p>在spring1.0中定义了两个接口BeanNameAware和BeanFactoryAware 接口。</p>
+<p>BeanNameAware：让Bean获取自己在BeanFactory配置中的名字（根据情况是id或者name）</p>
+<pre><code>public interface BeanNameAware {
+
+    /**
+     * Set the name of the bean in the bean factory that created this bean.
+     * &lt;p&gt;Invoked after population of normal bean properties but before an init
+     * callback like InitializingBean&apos;s afterPropertiesSet or a custom init-method.
+     * @param name the name of the bean in the factory
+     */
+    void setBeanName(String name);
+
+}
+</code></pre><p>BeanFactoryAware ：让Bean获取配置他们的BeanFactory的引用。</p>
+<pre><code>public interface BeanFactoryAware {
+
+    /**
+     * Callback that supplies the owning factory to a bean instance.
+     * &lt;p&gt;Invoked after population of normal bean properties but before an init
+     * callback like InitializingBean&apos;s afterPropertiesSet or a custom init-method.
+     * @param beanFactory owning BeanFactory (may not be null).
+     * The bean can immediately call methods on the factory.
+     * @throws BeansException in case of initialization errors
+     * @see BeanInitializationException
+     */
+    void setBeanFactory(BeanFactory beanFactory) throws BeansException;
+
+}
+</code></pre><p>我们只需实现这个接口，就可以获取bean的名称或者bean工厂的实例，那怎么做到的呢，我们再来看一下工厂获取bean的源码：</p>
+<pre><code>protected Object createBean(String beanName, RootBeanDefinition mergedBeanDefinition) throws BeansException {
+    //省略其他代码
+
+    //注意：这个就会Aware实现的源码
+    try {
+        if (bean instanceof BeanNameAware) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Invoking setBeanName() on BeanNameAware bean &apos;&quot; + beanName + &quot;&apos;&quot;);
+            }
+            ((BeanNameAware) bean).setBeanName(beanName);
+        }
+
+        if (bean instanceof BeanFactoryAware) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Invoking setBeanFactory() on BeanFactoryAware bean &apos;&quot; + beanName + &quot;&apos;&quot;);
+            }
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+</code></pre><p> //省略其他代码</p>
+<pre><code>}
+</code></pre><p>看到没有，其实很简单嘛！</p>
+<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：<em>**</em></p>
+<pre><code>package com.pb.entity;
+
+import org.springframework.beans.factory.BeanNameAware;
+/*
+ * 实体类实现init方法和BeanNameAware接口
+ */
+public class Hello implements BeanNameAware{
+
+    @Override
+    public void setBeanName(String arg0) {
+        System.out.println(&quot;回调setBeanName方法  id属性是&quot;+arg0);
+
+    }
+    public void init(){
+        System.out.println(&quot;正在执行初始化方法init&quot;);
+    }
+
+}
+</code></pre><p>applicationContext.xml</p>
+<pre><code>&lt;bean id=&quot;hello&quot; class=&quot;com.pb.entity.Hello&quot; init-method=&quot;init&quot;&gt;&lt;/bean&gt;
+</code></pre><p>测试类：</p>
+<pre><code>package com.pb.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.pb.entity.Hello;
+
+public class HelloTest {
+
+    public static void main(String[] args) {
+        ApplicationContext context=new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Hello hello=context.getBean(&quot;hello&quot;,Hello.class);
+
+    }
+
+}
+</code></pre><p>结果:</p>
+<pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init
+</code></pre><p><strong>2、</strong>BeanFactoryAware接口：<em>**</em></p>
+<pre><code>package com.pb.entity;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+/*
+ * 实体类实现init方法和BeanNameAware接口
+ */
+public class Hello implements BeanNameAware,BeanFactoryAware{
+    private BeanFactory bf;
+    @Override
+    public void setBeanName(String arg0) {
+        System.out.println(&quot;回调setBeanName方法  id属性是&quot;+arg0);
+
+    }
+    public void init(){
+        System.out.println(&quot;正在执行初始化方法init&quot;);
+    }
+
+    /*
+     * 重写setBeanFactory方法
+     * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+     */
+    @Override
+    public void setBeanFactory(BeanFactory arg0) throws BeansException {
+        this.bf=arg0;
+
+    }
+    public BeanFactory getBf() {
+        return bf;
+    }
+
+
+}
+</code></pre><p>配置文件不变</p>
+<p>测试类:</p>
+<pre><code>package com.pb.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.pb.entity.Hello;
+
+public class HelloTest {
+
+    public static void main(String[] args) {
+        ApplicationContext context=new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Hello hello=context.getBean(&quot;hello&quot;,Hello.class);
+        System.out.println(&quot;得到beanFactory对象 &quot;+hello.getBf());
+
+    }
+
+}
+</code></pre><p>结果：</p>
+<pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init得到beanFactory对象 org.springframework.beans.factory.support.DefaultListableBeanFactory@3dc0bb: defining beans [hello]; root of factory hierarchy
+</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/01/14/白话Spring源码（八）：Aware接口/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-白话Spring源码（七）：FactoryBean" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1697,11 +1920,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">sky平台</a>
+                <a href="javascript:void(0)" class="js-tag color4">spring源码</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">spring源码</a>
+                <a href="javascript:void(0)" class="js-tag color1">sky平台</a>
               </li>
             
             <div class="clearfix"></div>

@@ -6,21 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>白话Spring源码（三）：spring框架的理解 | haoxin963的博客</title>
+  <title>白话Spring源码（八）：Aware接口 | haoxin963的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
+  <meta name="description" content="我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。 一、为什么需要Aware大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）">
 <meta name="keywords" content="spring源码">
 <meta property="og:type" content="article">
-<meta property="og:title" content="白话Spring源码（三）：spring框架的理解">
-<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/index.html">
+<meta property="og:title" content="白话Spring源码（八）：Aware接口">
+<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（八）：Aware接口/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
-<meta property="og:description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/20181208153013997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-01-14T06:02:06.319Z">
+<meta property="og:description" content="我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。 一、为什么需要Aware大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）">
+<meta property="og:updated_time" content="2019-01-14T08:11:23.006Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="白话Spring源码（三）：spring框架的理解">
-<meta name="twitter:description" content="一、为什么需要Spring我们想一下如果没有spring框架我们是怎么去开发web应用呢？ 我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。 那spring框架给我们解决什么问题了呢？ 1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等 2.统一创建对象，维护">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20181208153013997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
+<meta name="twitter:title" content="白话Spring源码（八）：Aware接口">
+<meta name="twitter:description" content="我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。 一、为什么需要Aware大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）">
   
     <link rel="alternative" href="/atom.xml" title="haoxin963的博客" type="application/atom+xml">
   
@@ -150,43 +148,177 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-白话Spring源码（三）：spring框架的理解" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-白话Spring源码（八）：Aware接口" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      白话Spring源码（三）：spring框架的理解
+      白话Spring源码（八）：Aware接口
     </h1>
   
 
         
-        <a href="/2019/01/14/白话Spring源码（三）：spring框架的理解/" class="archive-article-date">
-  	<time datetime="2019-01-14T06:00:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+        <a href="/2019/01/14/白话Spring源码（八）：Aware接口/" class="archive-article-date">
+  	<time datetime="2019-01-14T08:08:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一、为什么需要Spring"><a href="#一、为什么需要Spring" class="headerlink" title="一、为什么需要Spring"></a>一、为什么需要Spring</h3><p>我们想一下如果没有spring框架我们是怎么去开发web应用呢？</p>
-<p>我估计大部分代码是跟业务无关而跟底层或者网络接口交互；对象，模块关系错综复杂；开发周期特别的长很容易流产；后期维护时代码会越来越烂，最后可能无法维护。。。</p>
-<p>那spring框架给我们解决什么问题了呢？</p>
-<p>1.封装非业务的代码，我们只需开发业务功能：比如获取请求的数据，保存数据库，事务等等</p>
-<p>2.统一创建对象，维护对象的关系和生命周期</p>
-<p>3.方便的对方法加入通用的代码</p>
-<p>4.简化与其他框架的结合使用</p>
-<p>总的来说就是为了简化我们企业应用开发的难度，让我们只关注业务功能的开发！</p>
-<p>据说开发spring框架是大神也是一位音乐家，所以我们会发现他写的代码很有艺术感，哈哈哈。。。</p>
-<h3 id="二、Spring框架的定义"><a href="#二、Spring框架的定义" class="headerlink" title="二、Spring框架的定义"></a>二、Spring框架的定义</h3><pre><code>Spring is a layered Java/J2EE application framework, based on code published in &quot;Expert One-on-One J2EE Designand Development&quot; by Rod Johnson (Wrox, 2002). Spring includes: * Powerful JavaBeans-based configuration management, applying Inversion-of-Control principles. This makeswiring up applications quick and easy. No more singletons littered throughout your codebase, no more arbitraryproperties files: one consistent and elegant approach everywhere. This core bean factory can be used in anyenvironment, from applets to J2EE containers. * Generic abstraction layer for transaction management, allowing for pluggable transaction managers, and makingit easy to demarcate transactions without dealing with low-level issues. Generic strategies for JTA and asingle JDBC DataSource are included. In contrast to plain JTA or EJB CMT, Spring&apos;s transaction support is nottied to J2EE environments.* JDBC abstraction layer that offers a meaningful exception hierarchy (no more pulling vendor codes out ofSQLException), simplifies error handling, and greatly reduces the amount of code you&apos;ll need to write.You&apos;ll never need to write another finally block to use JDBC again. The JDBC-oriented exceptions comply toSpring&apos;s generic DAO exception hierarchy. * Integration with Hibernate, JDO, and iBATIS SQL Maps: in terms of resource holders, DAO implementationsupport, and transaction strategies. First-class Hibernate support with lots of IoC convenience features,addressing many typical Hibernate integration issues. All of these comply to Spring&apos;s generic transactionand DAO exception hierarchies.* AOP functionality, fully integrated into Spring configuration management. You can AOP-enable any object managedby Spring, adding aspects such as declarative transaction management. With Spring, you can have declarativetransaction management without EJB... even without JTA, if you&apos;re using a single database in Tomcat or anotherweb container without JTA support. * Flexible MVC web application framework, built on core Spring functionality. This framework is highly configurablevia strategy interfaces, and accommodates multiple view technologies like JSP, Tiles, Velocity, FreeMarker, iText,and POI. Note that a Spring middle tier can easily be combined with a web tier based on any other web MVC framework,like Struts, WebWork, or Tapestry. You can use all of Spring&apos;s functionality in any J2EE server, and most of it also in non-managed environments.A central focus of Spring is to allow for reusable business and data access objects that are not tied to specificJ2EE services. Such objects can be reused across J2EE environments (web or EJB), standalone applications, testenvironments, etc without any hassle.Spring has a layered architecture; all its functionality builds on lower levels. So you can e.g. use theJavaBeans configuration management without using the MVC framework or AOP support. But if you use the web MVCframework or AOP support, you&apos;ll find they build on the configuration framework, so you can apply your knowledgeabout it immediately.
-</code></pre><p>上面是spring的开发者Rod Johnson对spring的介绍，为什么我贴出英文的呢？因为很多翻译过来的就变味了，我们程序员还是要坚持看英文原版的一些概念的解释，这样会更好的去理解作者的本意。</p>
-<h3 id="三、spring架构"><a href="#三、spring架构" class="headerlink" title="三、spring架构"></a>三、spring架构</h3><p><img src="https://img-blog.csdnimg.cn/20181208153013997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70" alt=""></p>
-<p>从这张官方的架构图种我们可以看出，spring Core是其他模块的基础，也是spring的核心模块，各模块的作用如下：</p>
-<pre><code>* &quot;spring-core&quot; (~185 KB)- Contents: bean container, core utilities- Dependencies: Commons Logging, (Log4J) * &quot;spring-aop&quot; (~110 KB)- Contents: AOP framework, source-level metadata support- Dependencies: spring-core, AOP Alliance, (CGLIB, Commons Attributes) * &quot;spring-context&quot; (~160 KB)- Contents: application context, validation framework, UI support, JNDI, mail, EJB, remoting, scheduling- Dependencies: spring-core, (Velocity, FreeMarker, JavaMail, EJB, JAX-RPC, Hessian, Burlap, Quartz) * &quot;spring-dao&quot; (~175 KB)- Contents: DAO support, transaction infrastructure, JDBC support- Dependencies: spring-core, (spring-aop, JTA) * &quot;spring-orm&quot; (~110 KB)- Contents: Hibernate support, JDO support, iBATIS SQL Maps support- Dependencies: spring-dao, (Hibernate, JDO, iBATIS SQL Maps) * &quot;spring-web&quot; (~70 KB)- Contents: web application context, multipart resolver, web utilities- Dependencies: spring-context, Servlet, (Commons FileUpload, COS) * &quot;spring-webmvc&quot; (~135 KB)- Contents: web MVC framework, web controllers, web views- Dependencies: spring-web, (JSP, JSTL, Tiles, iText, POI)
-</code></pre><h3 id="四、spring1-0源码地址"><a href="#四、spring1-0源码地址" class="headerlink" title="四、spring1.0源码地址"></a>四、spring1.0源码地址</h3><p><a href="https://gitee.com/haoxin963/spring-framework-1.0" target="_blank" rel="noopener">https://gitee.com/haoxin963/spring-framework-1.0</a></p>
-<p>大家可以去下载，开始学习spring源码之旅吧！</p>
+        <p>我们知道spring框架中所有bean都是在工厂里创建的，bean对自己是“无知觉”的，不知道自己叫什么名字（bean的id或者name），从哪里来（哪个工厂创建）。</p>
+<h3 id="一、为什么需要Aware"><a href="#一、为什么需要Aware" class="headerlink" title="一、为什么需要Aware"></a>一、为什么需要Aware</h3><p>大家看过黑客帝国电影吧，黑客帝国中机械工厂里面“养殖”的人类，他们虽然能完成一定的功能，但是根本不知道自己在工厂（BeanFactory）中的代号（id），或者自己是在哪个工厂（BeanFactory的引用）中沉睡。所以，本节的目的就是要创造出一个尼奥一样的Bean，让他知道自己在工厂中的id和自己原来躺在哪个工厂中。</p>
+<p>这里，称之为，<strong>Bean对Spring有知觉（Aware翻译过来就是知觉）。</strong></p>
+<h3 id="二、Aware是怎么实现的"><a href="#二、Aware是怎么实现的" class="headerlink" title="二、Aware是怎么实现的"></a>二、Aware是怎么实现的</h3><p>在spring1.0中定义了两个接口BeanNameAware和BeanFactoryAware 接口。</p>
+<p>BeanNameAware：让Bean获取自己在BeanFactory配置中的名字（根据情况是id或者name）</p>
+<pre><code>public interface BeanNameAware {
 
+    /**
+     * Set the name of the bean in the bean factory that created this bean.
+     * &lt;p&gt;Invoked after population of normal bean properties but before an init
+     * callback like InitializingBean&apos;s afterPropertiesSet or a custom init-method.
+     * @param name the name of the bean in the factory
+     */
+    void setBeanName(String name);
+
+}
+</code></pre><p>BeanFactoryAware ：让Bean获取配置他们的BeanFactory的引用。</p>
+<pre><code>public interface BeanFactoryAware {
+
+    /**
+     * Callback that supplies the owning factory to a bean instance.
+     * &lt;p&gt;Invoked after population of normal bean properties but before an init
+     * callback like InitializingBean&apos;s afterPropertiesSet or a custom init-method.
+     * @param beanFactory owning BeanFactory (may not be null).
+     * The bean can immediately call methods on the factory.
+     * @throws BeansException in case of initialization errors
+     * @see BeanInitializationException
+     */
+    void setBeanFactory(BeanFactory beanFactory) throws BeansException;
+
+}
+</code></pre><p>我们只需实现这个接口，就可以获取bean的名称或者bean工厂的实例，那怎么做到的呢，我们再来看一下工厂获取bean的源码：</p>
+<pre><code>protected Object createBean(String beanName, RootBeanDefinition mergedBeanDefinition) throws BeansException {
+    //省略其他代码
+
+    //注意：这个就会Aware实现的源码
+    try {
+        if (bean instanceof BeanNameAware) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Invoking setBeanName() on BeanNameAware bean &apos;&quot; + beanName + &quot;&apos;&quot;);
+            }
+            ((BeanNameAware) bean).setBeanName(beanName);
+        }
+
+        if (bean instanceof BeanFactoryAware) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Invoking setBeanFactory() on BeanFactoryAware bean &apos;&quot; + beanName + &quot;&apos;&quot;);
+            }
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+</code></pre><p> //省略其他代码</p>
+<pre><code>}
+</code></pre><p>看到没有，其实很简单嘛！</p>
+<h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p><strong>1、</strong>beanNameAware接口：<em>**</em></p>
+<pre><code>package com.pb.entity;
+
+import org.springframework.beans.factory.BeanNameAware;
+/*
+ * 实体类实现init方法和BeanNameAware接口
+ */
+public class Hello implements BeanNameAware{
+
+    @Override
+    public void setBeanName(String arg0) {
+        System.out.println(&quot;回调setBeanName方法  id属性是&quot;+arg0);
+
+    }
+    public void init(){
+        System.out.println(&quot;正在执行初始化方法init&quot;);
+    }
+
+}
+</code></pre><p>applicationContext.xml</p>
+<pre><code>&lt;bean id=&quot;hello&quot; class=&quot;com.pb.entity.Hello&quot; init-method=&quot;init&quot;&gt;&lt;/bean&gt;
+</code></pre><p>测试类：</p>
+<pre><code>package com.pb.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.pb.entity.Hello;
+
+public class HelloTest {
+
+    public static void main(String[] args) {
+        ApplicationContext context=new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Hello hello=context.getBean(&quot;hello&quot;,Hello.class);
+
+    }
+
+}
+</code></pre><p>结果:</p>
+<pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init
+</code></pre><p><strong>2、</strong>BeanFactoryAware接口：<em>**</em></p>
+<pre><code>package com.pb.entity;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+/*
+ * 实体类实现init方法和BeanNameAware接口
+ */
+public class Hello implements BeanNameAware,BeanFactoryAware{
+    private BeanFactory bf;
+    @Override
+    public void setBeanName(String arg0) {
+        System.out.println(&quot;回调setBeanName方法  id属性是&quot;+arg0);
+
+    }
+    public void init(){
+        System.out.println(&quot;正在执行初始化方法init&quot;);
+    }
+
+    /*
+     * 重写setBeanFactory方法
+     * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+     */
+    @Override
+    public void setBeanFactory(BeanFactory arg0) throws BeansException {
+        this.bf=arg0;
+
+    }
+    public BeanFactory getBf() {
+        return bf;
+    }
+
+
+}
+</code></pre><p>配置文件不变</p>
+<p>测试类:</p>
+<pre><code>package com.pb.demo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.pb.entity.Hello;
+
+public class HelloTest {
+
+    public static void main(String[] args) {
+        ApplicationContext context=new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        Hello hello=context.getBean(&quot;hello&quot;,Hello.class);
+        System.out.println(&quot;得到beanFactory对象 &quot;+hello.getBf());
+
+    }
+
+}
+</code></pre><p>结果：</p>
+<pre><code>回调setBeanName方法  id属性是hello正在执行初始化方法init得到beanFactory对象 org.springframework.beans.factory.support.DefaultListableBeanFactory@3dc0bb: defining beans [hello]; root of factory hierarchy
+</code></pre>
       
 
       
@@ -276,7 +408,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（八）：Aware接口/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -290,18 +422,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/01/14/白话Spring源码（四）：BeanFactory/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          白话Spring源码（四）：BeanFactory
-        
-      </div>
-    </a>
   
-  
-    <a href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">白话Spring源码（二）：spring源码分享的思路</div>
+    <a href="/2019/01/14/白话Spring源码（七）：FactoryBean/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">白话Spring源码（七）：FactoryBean</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -342,7 +465,7 @@
 <script src="https://billts.site/js/gitment.js"></script>
 <script>
 var gitment = new Gitment({
-  id: "http://yoursite.com/2019/01/14/白话Spring源码（三）：spring框架的理解/",
+  id: "http://yoursite.com/2019/01/14/白话Spring源码（八）：Aware接口/",
   owner: 'haoxin963',
   repo: 'haoxin963.github.io',
   oauth: {
