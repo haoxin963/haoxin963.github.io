@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="haoxin963的博客">
 <meta property="og:description" content="一、什么是BeanFactory我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。 好了，">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20181208201738118.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-01-14T07:39:02.270Z">
+<meta property="og:updated_time" content="2019-01-14T07:41:47.443Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="白话Spring源码（四）：BeanFactory">
 <meta name="twitter:description" content="一、什么是BeanFactory我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。 好了，">
@@ -222,8 +222,10 @@
 <p>　　第三层: 配置功能</p>
 <p>　　第四层: 配置+迭代</p>
 <p>具体源码如下：</p>
-<p>1.BeanFactory源码，主要就是获取bean对象<br>    public interface BeanFactory {</p>
-<pre><code>    /**
+<p>1.BeanFactory源码：主要就是获取bean对象</p>
+<pre><code>public interface BeanFactory {
+
+    /**
      * 通过名称获取bean对象
      */
     Object getBean(String name) throws BeansException;

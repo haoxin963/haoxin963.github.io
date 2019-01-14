@@ -217,8 +217,10 @@
 <p>　　第三层: 配置功能</p>
 <p>　　第四层: 配置+迭代</p>
 <p>具体源码如下：</p>
-<p>1.BeanFactory源码，主要就是获取bean对象<br>    public interface BeanFactory {</p>
-<pre><code>    /**
+<p>1.BeanFactory源码：主要就是获取bean对象</p>
+<pre><code>public interface BeanFactory {
+
+    /**
      * 通过名称获取bean对象
      */
     Object getBean(String name) throws BeansException;
