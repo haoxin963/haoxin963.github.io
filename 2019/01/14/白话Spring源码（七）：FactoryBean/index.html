@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019/1 | haoxin963的博客</title>
+  <title>白话Spring源码（七）：FactoryBean | haoxin963的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="haoxin963的博客">
-<meta property="og:url" content="http://yoursite.com/archives/2019/01/index.html">
+  <meta name="description" content="看清楚是FactoryBean，不是BeanFactory，虽然他们长得很像，但作用确实天差地别，BeanFactory是bean工厂，前面的博客已经介绍过了，他们工厂类的基础接口，而FactoryBean是一种bean，那为什么要有这种bean呢，和一般的bean有什么区别呢？下面跟大家分享一下FactoryBean。 一、为什么需要FactoryBean我们知道spring里一切皆是bean，">
+<meta name="keywords" content="spring源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="白话Spring源码（七）：FactoryBean">
+<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（七）：FactoryBean/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
+<meta property="og:description" content="看清楚是FactoryBean，不是BeanFactory，虽然他们长得很像，但作用确实天差地别，BeanFactory是bean工厂，前面的博客已经介绍过了，他们工厂类的基础接口，而FactoryBean是一种bean，那为什么要有这种bean呢，和一般的bean有什么区别呢？下面跟大家分享一下FactoryBean。 一、为什么需要FactoryBean我们知道spring里一切皆是bean，">
+<meta property="og:updated_time" content="2019-01-14T08:07:25.929Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="haoxin963的博客">
+<meta name="twitter:title" content="白话Spring源码（七）：FactoryBean">
+<meta name="twitter:description" content="看清楚是FactoryBean，不是BeanFactory，虽然他们长得很像，但作用确实天差地别，BeanFactory是bean工厂，前面的博客已经介绍过了，他们工厂类的基础接口，而FactoryBean是一种bean，那为什么要有这种bean呢，和一般的bean有什么区别呢？下面跟大家分享一下FactoryBean。 一、为什么需要FactoryBean我们知道spring里一切皆是bean，">
   
     <link rel="alternative" href="/atom.xml" title="haoxin963的博客" type="application/atom+xml">
   
@@ -143,36 +148,296 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-白话Spring源码（七）：FactoryBean" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      白话Spring源码（七）：FactoryBean
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（七）：FactoryBean/" class="archive-article-date">
+
+        
+        <a href="/2019/01/14/白话Spring源码（七）：FactoryBean/" class="archive-article-date">
   	<time datetime="2019-01-14T08:04:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（七）：FactoryBean/">白话Spring源码（七）：FactoryBean</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看清楚是FactoryBean，不是BeanFactory，虽然他们长得很像，但作用确实天差地别，BeanFactory是bean工厂，前面的博客已经介绍过了，他们工厂类的基础接口，而FactoryBean是一种bean，那为什么要有这种bean呢，和一般的bean有什么区别呢？下面跟大家分享一下FactoryBean。</p>
+<h3 id="一、为什么需要FactoryBean"><a href="#一、为什么需要FactoryBean" class="headerlink" title="一、为什么需要FactoryBean"></a>一、为什么需要FactoryBean</h3><p>我们知道spring里一切皆是bean，Spring通过反射机制利用<bean>的class属性指定实现类实例化Bean，但是有些情况下，实例化Bean过程比较复杂，如果按照传统的方式，则需要在<bean>中提供大量的配置信息。配置方式的灵活性是受限的，这时采用编码的方式可能会得到一个简单的方案。这时FactoryBean就出现了，<strong>FactoryBean就是通过编码的方式灵活的创建bean的实例</strong>，这也是工厂模式设计模式的运用。</bean></bean></p>
+<h3 id="二、什么是FactoryBean"><a href="#二、什么是FactoryBean" class="headerlink" title="二、什么是FactoryBean"></a>二、什么是FactoryBean</h3><p>FactoryBean是一个接口，getObject就是创建bean实例的关键方法。</p>
+<pre><code>public interface FactoryBean {
 
-        <div class="article-info info-on-right">
-          
+    /**
+     * Return an instance (possibly shared or independent) of the object
+     * managed by this factory. As with a BeanFactory, this allows
+     * support for both the Singleton and Prototype design pattern.
+     * @return an instance of the bean (should never be null)
+     * @throws Exception in case of creation errors
+     */
+    Object getObject() throws Exception;
+
+    /**
+     * Return the type of object that this FactoryBean creates, or null
+     * if not known in advance. This allows to check for specific types of
+     * beans without instantiating objects, e.g. on autowiring.
+     * &lt;p&gt;For a singleton, this can simply return getObject().getClass(),
+     * or even null, as autowiring will always check the actual objects
+     * for singletons. For prototypes, returning a meaningful type here
+     * is highly advisable, as autowiring will simply ignore them else.
+     * @return the type of object that this FactoryBean creates, or null
+     * @see ListableBeanFactory#getBeansOfType
+     */
+    Class getObjectType();
+
+    /**
+     * Is the bean managed by this factory a singleton or a prototype?
+     * That is, will getObject() always return the same object?
+     * &lt;p&gt;The singleton status of the FactoryBean itself will
+     * generally be provided by the owning BeanFactory.
+     * @return if this bean is a singleton
+     */
+    boolean isSingleton();
+
+}
+</code></pre><p>getObject()：返回由FactoryBean创建的bean实例，如果isSingleton()返回true，则该实例会放到Spring容器中单实例缓存池中。</p>
+<p>boolean isSingleton()：返回由FactoryBean创建的bean实例的作用域是singleton还是prototype。</p>
+<p>Class<t> getObjectType()：返回FactoryBean创建的bean类型。</t></p>
+<p>bean工厂创建bean对象时要判断改对象是否是FactoryBean，如果是FactoryBean则调用他的getObject()方法获取实例化bean。AbstractBeanFactory源码如下：</p>
+<pre><code>protected Object getObjectForSharedInstance(String name, Object beanInstance) {
+    String beanName = transformedBeanName(name);
+
+    // Don&apos;t let calling code try to dereference the
+    // bean factory if the bean isn&apos;t a factory
+    if (isFactoryDereference(name) &amp;&amp; !(beanInstance instanceof FactoryBean)) {
+        throw new BeanIsNotAFactoryException(beanName, beanInstance);
+    }
+
+    // Now we have the bean instance, which may be a normal bean
+    // or a FactoryBean. If it&apos;s a FactoryBean, we use it to
+    // create a bean instance, unless the caller actually wants
+    // a reference to the factory.
+    if (beanInstance instanceof FactoryBean) {
+        if (!isFactoryDereference(name)) {
+            // return bean instance from factory
+            FactoryBean factory = (FactoryBean) beanInstance;
+            logger.debug(&quot;Bean with name &apos;&quot; + beanName + &quot;&apos; is a factory bean&quot;);
+            try {
+                beanInstance = factory.getObject();
+            }
+            catch (BeansException ex) {
+                throw ex;
+            }
+            catch (Exception ex) {
+                throw new BeanCreationException(&quot;FactoryBean threw exception on object creation&quot;, ex);
+            }
+            if (beanInstance == null) {
+                throw new FactoryBeanCircularReferenceException(
+                    &quot;Factory bean &apos;&quot; + beanName + &quot;&apos; returned null object - &quot; +
+                    &quot;possible cause: not fully initialized due to circular bean reference&quot;);
+            }
+        }
+        else {
+            // the user wants the factory itself
+            logger.debug(&quot;Calling code asked for FactoryBean instance for name &apos;&quot; + beanName + &quot;&apos;&quot;);
+        }
+    }
+
+    return beanInstance;
+}
+</code></pre><h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p>当前微服务日趋流行，项目开发中不可避免的需要去调用一些其他系统接口，这个时候选择一个合适的HTTP client library 就很关键了，本人项目开发中使用 Square 开源的<a href="https://link.jianshu.com?t=https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp</a> 。<br>OkHttp本身的API 已经非常好用了，结合Spring 以及在其他项目中复用的目的，对OkHttp 创建过程做了一些封装，例如超时时间、连接池大小、http代理等。</p>
+<p>maven依赖：</p>
+<pre><code>&lt;dependency&gt;
+            &lt;groupId&gt;com.squareup.okhttp3&lt;/groupId&gt;
+            &lt;artifactId&gt;okhttp&lt;/artifactId&gt;
+            &lt;version&gt;3.6.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>首先，是OkHttpClientFactoryBean ，代码如下：</p>
+<pre><code>package com.bytebeats.codelab.http.okhttp;
+
+import com.bytebeats.codelab.http.util.StringUtils;
+import okhttp3.*;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * ${DESCRIPTION}
+ *
+ * @author Ricky Fung
+ * @create 2017-03-04 22:18
+ */
+public class OkHttpClientFactoryBean implements FactoryBean, DisposableBean {
+    private int connectTimeout;
+    private int readTimeout;
+    private int writeTimeout;
+
+    /**http proxy config**/
+    private String host;
+    private int port;
+    private String username;
+    private String password;
+
+
+    /**OkHttpClient instance**/
+    private OkHttpClient client;
+
+    @Override
+    public Object getObject() throws Exception {
+
+        ConnectionPool pool = new ConnectionPool(5, 10, TimeUnit.SECONDS);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .connectionPool(pool);
+
+        if(StringUtils.isNotBlank(host) &amp;&amp; port&gt;0){
+            Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(host, port));
+            builder.proxy(proxy);
+        }
+
+        if(StringUtils.isNotBlank(username) &amp;&amp; StringUtils.isNotBlank(password)){
+            Authenticator proxyAuthenticator = new Authenticator() {
+                @Override
+                public Request authenticate(Route route, Response response) throws IOException {
+                    String credential = Credentials.basic(username, password);
+                    return response.request().newBuilder()
+                            .header(&quot;Proxy-Authorization&quot;, credential)
+                            .build();
+                }
+            };
+            builder.proxyAuthenticator(proxyAuthenticator);
+        }
+
+        client = builder.build();
+        return client;
+    }
+
+    @Override
+    public Class&lt;?&gt; getObjectType() {
+        return OkHttpClient.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if(client!=null){
+            client.connectionPool().evictAll();
+            client.dispatcher().executorService().shutdown();
+            client.cache().close();
+            client = null;
+        }
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public void setWriteTimeout(int writeTimeout) {
+        this.writeTimeout = writeTimeout;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+}
+</code></pre><p>项目中引用 applicationContext.xml：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xmlns:util=&quot;http://www.springframework.org/schema/util&quot;
+       xsi:schemaLocation=&quot;
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+
+    &lt;bean id=&quot;okHttpClient&quot; class=&quot;com.bytebeats.codelab.http.okhttp.OkHttpClientFactoryBean&quot;&gt;
+        &lt;property name=&quot;connectTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;readTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;writeTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;host&quot; value=&quot;&quot; /&gt;
+        &lt;property name=&quot;port&quot; value=&quot;0&quot; /&gt;
+        &lt;property name=&quot;username&quot; value=&quot;&quot; /&gt;
+        &lt;property name=&quot;password&quot; value=&quot;&quot; /&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><p>写个测试类测试一下：</p>
+<pre><code>@Resource
+private OkHttpClient client;
+
+public void run() throws Exception {
+    Request request = new Request.Builder()
+            .url(&quot;https://www.baidu.com/&quot;)
+            .build();
+
+    Response response = client.newCall(request).execute();
+    if (!response.isSuccessful()) throw new IOException(&quot;Unexpected code &quot; + response);
+
+    System.out.println(response.body().string());
+}
+</code></pre>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -184,285 +449,124 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（七）：FactoryBean/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（六）：BeanDefinition的注册过程/" class="archive-article-date">
-  	<time datetime="2019-01-14T07:49:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2019/01/14/白话Spring源码（六）：BeanDefinition的注册过程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">白话Spring源码（六）：BeanDefinition的注册过程</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（六）：BeanDefinition的注册过程/">白话Spring源码（六）：BeanDefinition的注册过程</a>
-    </h1>
-  
+        
+        
+    </div>
+</aside>
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
 
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（五）：Bean的创建过程/" class="archive-article-date">
-  	<time datetime="2019-01-14T07:46:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（五）：Bean的创建过程/">白话Spring源码（五）：Bean的创建过程</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（四）：BeanFactory/" class="archive-article-date">
-  	<time datetime="2019-01-14T06:04:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（四）：BeanFactory/">白话Spring源码（四）：BeanFactory</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（三）：spring框架的理解/" class="archive-article-date">
-  	<time datetime="2019-01-14T06:00:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（三）：spring框架的理解/">白话Spring源码（三）：spring框架的理解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:58:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（二）：spring源码分享的思路/">白话Spring源码（二）：spring源码分享的思路</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:48:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/">白话Spring源码（一）：怎么阅读源码</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/sky微服务接口平台上线/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:25:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/sky微服务接口平台上线/">sky平台</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">sky平台</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
     
+ 
+  
+
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://billts.site/extra_css/gitment.css">
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2019/01/14/白话Spring源码（七）：FactoryBean/",
+  owner: 'haoxin963',
+  repo: 'haoxin963.github.io',
+  oauth: {
+    client_id: '122ffb2d712f40efbf52',
+    client_secret: '0ee50381131e30c83fab491ee728542fac43cef4',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -485,8 +589,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

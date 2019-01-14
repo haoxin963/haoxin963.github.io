@@ -145,6 +145,320 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-白话Spring源码（七）：FactoryBean" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/14/白话Spring源码（七）：FactoryBean/">白话Spring源码（七）：FactoryBean</a>
+    </h1>
+  
+
+        
+        <a href="/2019/01/14/白话Spring源码（七）：FactoryBean/" class="archive-article-date">
+  	<time datetime="2019-01-14T08:04:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看清楚是FactoryBean，不是BeanFactory，虽然他们长得很像，但作用确实天差地别，BeanFactory是bean工厂，前面的博客已经介绍过了，他们工厂类的基础接口，而FactoryBean是一种bean，那为什么要有这种bean呢，和一般的bean有什么区别呢？下面跟大家分享一下FactoryBean。</p>
+<h3 id="一、为什么需要FactoryBean"><a href="#一、为什么需要FactoryBean" class="headerlink" title="一、为什么需要FactoryBean"></a>一、为什么需要FactoryBean</h3><p>我们知道spring里一切皆是bean，Spring通过反射机制利用<bean>的class属性指定实现类实例化Bean，但是有些情况下，实例化Bean过程比较复杂，如果按照传统的方式，则需要在<bean>中提供大量的配置信息。配置方式的灵活性是受限的，这时采用编码的方式可能会得到一个简单的方案。这时FactoryBean就出现了，<strong>FactoryBean就是通过编码的方式灵活的创建bean的实例</strong>，这也是工厂模式设计模式的运用。</bean></bean></p>
+<h3 id="二、什么是FactoryBean"><a href="#二、什么是FactoryBean" class="headerlink" title="二、什么是FactoryBean"></a>二、什么是FactoryBean</h3><p>FactoryBean是一个接口，getObject就是创建bean实例的关键方法。</p>
+<pre><code>public interface FactoryBean {
+
+    /**
+     * Return an instance (possibly shared or independent) of the object
+     * managed by this factory. As with a BeanFactory, this allows
+     * support for both the Singleton and Prototype design pattern.
+     * @return an instance of the bean (should never be null)
+     * @throws Exception in case of creation errors
+     */
+    Object getObject() throws Exception;
+
+    /**
+     * Return the type of object that this FactoryBean creates, or null
+     * if not known in advance. This allows to check for specific types of
+     * beans without instantiating objects, e.g. on autowiring.
+     * &lt;p&gt;For a singleton, this can simply return getObject().getClass(),
+     * or even null, as autowiring will always check the actual objects
+     * for singletons. For prototypes, returning a meaningful type here
+     * is highly advisable, as autowiring will simply ignore them else.
+     * @return the type of object that this FactoryBean creates, or null
+     * @see ListableBeanFactory#getBeansOfType
+     */
+    Class getObjectType();
+
+    /**
+     * Is the bean managed by this factory a singleton or a prototype?
+     * That is, will getObject() always return the same object?
+     * &lt;p&gt;The singleton status of the FactoryBean itself will
+     * generally be provided by the owning BeanFactory.
+     * @return if this bean is a singleton
+     */
+    boolean isSingleton();
+
+}
+</code></pre><p>getObject()：返回由FactoryBean创建的bean实例，如果isSingleton()返回true，则该实例会放到Spring容器中单实例缓存池中。</p>
+<p>boolean isSingleton()：返回由FactoryBean创建的bean实例的作用域是singleton还是prototype。</p>
+<p>Class<t> getObjectType()：返回FactoryBean创建的bean类型。</t></p>
+<p>bean工厂创建bean对象时要判断改对象是否是FactoryBean，如果是FactoryBean则调用他的getObject()方法获取实例化bean。AbstractBeanFactory源码如下：</p>
+<pre><code>protected Object getObjectForSharedInstance(String name, Object beanInstance) {
+    String beanName = transformedBeanName(name);
+
+    // Don&apos;t let calling code try to dereference the
+    // bean factory if the bean isn&apos;t a factory
+    if (isFactoryDereference(name) &amp;&amp; !(beanInstance instanceof FactoryBean)) {
+        throw new BeanIsNotAFactoryException(beanName, beanInstance);
+    }
+
+    // Now we have the bean instance, which may be a normal bean
+    // or a FactoryBean. If it&apos;s a FactoryBean, we use it to
+    // create a bean instance, unless the caller actually wants
+    // a reference to the factory.
+    if (beanInstance instanceof FactoryBean) {
+        if (!isFactoryDereference(name)) {
+            // return bean instance from factory
+            FactoryBean factory = (FactoryBean) beanInstance;
+            logger.debug(&quot;Bean with name &apos;&quot; + beanName + &quot;&apos; is a factory bean&quot;);
+            try {
+                beanInstance = factory.getObject();
+            }
+            catch (BeansException ex) {
+                throw ex;
+            }
+            catch (Exception ex) {
+                throw new BeanCreationException(&quot;FactoryBean threw exception on object creation&quot;, ex);
+            }
+            if (beanInstance == null) {
+                throw new FactoryBeanCircularReferenceException(
+                    &quot;Factory bean &apos;&quot; + beanName + &quot;&apos; returned null object - &quot; +
+                    &quot;possible cause: not fully initialized due to circular bean reference&quot;);
+            }
+        }
+        else {
+            // the user wants the factory itself
+            logger.debug(&quot;Calling code asked for FactoryBean instance for name &apos;&quot; + beanName + &quot;&apos;&quot;);
+        }
+    }
+
+    return beanInstance;
+}
+</code></pre><h3 id="三、demo"><a href="#三、demo" class="headerlink" title="三、demo"></a>三、demo</h3><p>当前微服务日趋流行，项目开发中不可避免的需要去调用一些其他系统接口，这个时候选择一个合适的HTTP client library 就很关键了，本人项目开发中使用 Square 开源的<a href="https://link.jianshu.com?t=https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp</a> 。<br>OkHttp本身的API 已经非常好用了，结合Spring 以及在其他项目中复用的目的，对OkHttp 创建过程做了一些封装，例如超时时间、连接池大小、http代理等。</p>
+<p>maven依赖：</p>
+<pre><code>&lt;dependency&gt;
+            &lt;groupId&gt;com.squareup.okhttp3&lt;/groupId&gt;
+            &lt;artifactId&gt;okhttp&lt;/artifactId&gt;
+            &lt;version&gt;3.6.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>首先，是OkHttpClientFactoryBean ，代码如下：</p>
+<pre><code>package com.bytebeats.codelab.http.okhttp;
+
+import com.bytebeats.codelab.http.util.StringUtils;
+import okhttp3.*;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.FactoryBean;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * ${DESCRIPTION}
+ *
+ * @author Ricky Fung
+ * @create 2017-03-04 22:18
+ */
+public class OkHttpClientFactoryBean implements FactoryBean, DisposableBean {
+    private int connectTimeout;
+    private int readTimeout;
+    private int writeTimeout;
+
+    /**http proxy config**/
+    private String host;
+    private int port;
+    private String username;
+    private String password;
+
+
+    /**OkHttpClient instance**/
+    private OkHttpClient client;
+
+    @Override
+    public Object getObject() throws Exception {
+
+        ConnectionPool pool = new ConnectionPool(5, 10, TimeUnit.SECONDS);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .connectionPool(pool);
+
+        if(StringUtils.isNotBlank(host) &amp;&amp; port&gt;0){
+            Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(host, port));
+            builder.proxy(proxy);
+        }
+
+        if(StringUtils.isNotBlank(username) &amp;&amp; StringUtils.isNotBlank(password)){
+            Authenticator proxyAuthenticator = new Authenticator() {
+                @Override
+                public Request authenticate(Route route, Response response) throws IOException {
+                    String credential = Credentials.basic(username, password);
+                    return response.request().newBuilder()
+                            .header(&quot;Proxy-Authorization&quot;, credential)
+                            .build();
+                }
+            };
+            builder.proxyAuthenticator(proxyAuthenticator);
+        }
+
+        client = builder.build();
+        return client;
+    }
+
+    @Override
+    public Class&lt;?&gt; getObjectType() {
+        return OkHttpClient.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if(client!=null){
+            client.connectionPool().evictAll();
+            client.dispatcher().executorService().shutdown();
+            client.cache().close();
+            client = null;
+        }
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public void setWriteTimeout(int writeTimeout) {
+        this.writeTimeout = writeTimeout;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+}
+</code></pre><p>项目中引用 applicationContext.xml：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xmlns:util=&quot;http://www.springframework.org/schema/util&quot;
+       xsi:schemaLocation=&quot;
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+
+    &lt;bean id=&quot;okHttpClient&quot; class=&quot;com.bytebeats.codelab.http.okhttp.OkHttpClientFactoryBean&quot;&gt;
+        &lt;property name=&quot;connectTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;readTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;writeTimeout&quot; value=&quot;2000&quot; /&gt;
+        &lt;property name=&quot;host&quot; value=&quot;&quot; /&gt;
+        &lt;property name=&quot;port&quot; value=&quot;0&quot; /&gt;
+        &lt;property name=&quot;username&quot; value=&quot;&quot; /&gt;
+        &lt;property name=&quot;password&quot; value=&quot;&quot; /&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><p>写个测试类测试一下：</p>
+<pre><code>@Resource
+private OkHttpClient client;
+
+public void run() throws Exception {
+    Request request = new Request.Builder()
+            .url(&quot;https://www.baidu.com/&quot;)
+            .build();
+
+    Response response = client.newCall(request).execute();
+    if (!response.isSuccessful()) throw new IOException(&quot;Unexpected code &quot; + response);
+
+    System.out.println(response.body().string());
+}
+</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/01/14/白话Spring源码（七）：FactoryBean/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-白话Spring源码（六）：BeanDefinition的注册过程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
