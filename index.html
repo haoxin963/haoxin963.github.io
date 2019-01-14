@@ -179,7 +179,34 @@
 </ul>
 <p>为什么要这些规范呢？我们得要了解组件，国外的程序员喜欢用图像化的方式来做业务的开发，就是类似vb,.net的拖拖放放，然后修改属性和添加事件，这些可以拖拽的图形就是组件啦！现在国外还是有很多用图形化来生成java对象，开发业务的功能的。所以这些规范就方便创建对象，设置属性值，设置对象的依赖的。</p>
 <p>javabean的demo</p>
-<pre><code>public class StudentsBean implements java.io.Serializable{   private String firstName = null;   private String lastName = null;   private int age = 0;    public StudentsBean() {   }   public String getFirstName(){      return firstName;   }   public String getLastName(){      return lastName;   }   public int getAge(){      return age;   }    public void setFirstName(String firstName){      this.firstName = firstName;   }   public void setLastName(String lastName){      this.lastName = lastName;   }   public void setAge(int age) {      this.age = age;   }}
+<pre><code>public class StudentsBean implements java.io.Serializable
+{
+   private String firstName = null;
+   private String lastName = null;
+   private int age = 0;
+
+   public StudentsBean() {
+   }
+   public String getFirstName(){
+      return firstName;
+   }
+   public String getLastName(){
+      return lastName;
+   }
+   public int getAge(){
+      return age;
+   }
+
+   public void setFirstName(String firstName){
+      this.firstName = firstName;
+   }
+   public void setLastName(String lastName){
+      this.lastName = lastName;
+   }
+   public void setAge(int age) {
+      this.age = age;
+   }
+}
 </code></pre><h3 id="二、BeanFactory的结构"><a href="#二、BeanFactory的结构" class="headerlink" title="二、BeanFactory的结构"></a>二、BeanFactory的结构</h3><p>beanFactory及子接口的结构图：</p>
 <p><img src="https://img-blog.csdnimg.cn/20181208201738118.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70" alt=""></p>
 <p>看到这边,我们是不是想起了设计模式原则里的接口隔离原则</p>
