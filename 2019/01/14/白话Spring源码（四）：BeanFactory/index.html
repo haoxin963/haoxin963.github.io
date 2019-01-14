@@ -6,14 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: sky平台 | haoxin963的博客</title>
+  <title>白话Spring源码（四）：BeanFactory | haoxin963的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="haoxin963的博客">
-<meta property="og:url" content="http://yoursite.com/tags/sky平台/index.html">
+  <meta name="description" content="一、什么是BeanFactory我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。 好了，">
+<meta name="keywords" content="spring源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="白话Spring源码（四）：BeanFactory">
+<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（四）：BeanFactory/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
+<meta property="og:description" content="一、什么是BeanFactory我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。 好了，">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20181208201738118.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-01-14T06:05:30.896Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="haoxin963的博客">
+<meta name="twitter:title" content="白话Spring源码（四）：BeanFactory">
+<meta name="twitter:description" content="一、什么是BeanFactory我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。 好了，">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20181208201738118.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70">
   
     <link rel="alternative" href="/atom.xml" title="haoxin963的博客" type="application/atom+xml">
   
@@ -143,60 +150,221 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-白话Spring源码（四）：BeanFactory" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/sky微服务接口平台上线/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:25:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/sky微服务接口平台上线/">sky平台</a>
+    <h1 class="article-title" itemprop="name">
+      白话Spring源码（四）：BeanFactory
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2019/01/14/白话Spring源码（四）：BeanFactory/" class="archive-article-date">
+  	<time datetime="2019-01-14T06:04:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、什么是BeanFactory"><a href="#一、什么是BeanFactory" class="headerlink" title="一、什么是BeanFactory"></a>一、什么是BeanFactory</h3><p>我们先学习Spring最核心的功能：IoC,控制反转又叫依赖注入，这概念是不是很难理解，这是出于商业的目的才起这么个高大上的概念，其实我们阅读源码后发现其实很简单：就是对象通过xml定义好，然后通过java的反射机制new出对象，最后放在一个map里，想用就就从map里get出来。我们很多时候是被概念吓住了。但是我们要开发出很稳定的，扩展性好的还是很不容易。</p>
+<p>好了，我们先从最基础的BeanFactory开始吧！</p>
+<p>BeanFactory是什么？这是个工厂模式，工厂模式就是我们不直接new一个对象，而是从工厂里取，工厂会创建给我们。</p>
+<p>那BeanFactory就是我们不直接new一个bean，而是BeanFactory创建好返回给我们。</p>
+<p>可能有人会问什么是bean啊？可能很多人一直在用，但不一定能回答上来</p>
+<p>bean英文豆子的意思，我们知道java一种咖啡，那javabean就是咖啡豆，所以javabean就java中很基础的一个组件，注意这不是spring发明的，是jre自带的。</p>
+<p>它通常具有如下特点：</p>
+<ul>
+<li>这个Java类必须具有一个无参的构造函数</li>
+<li>属性必须私有化。</li>
+<li>私有化的属性必须通过public类型的方法暴露给其它程序，并且方法的命名也必须遵守一定的命名规范。</li>
+</ul>
+<p>为什么要这些规范呢？我们得要了解组件，国外的程序员喜欢用图像化的方式来做业务的开发，就是类似vb,.net的拖拖放放，然后修改属性和添加事件，这些可以拖拽的图形就是组件啦！现在国外还是有很多用图形化来生成java对象，开发业务的功能的。所以这些规范就方便创建对象，设置属性值，设置对象的依赖的。</p>
+<p>javabean的demo</p>
+<pre><code>public class StudentsBean implements java.io.Serializable{   private String firstName = null;   private String lastName = null;   private int age = 0;    public StudentsBean() {   }   public String getFirstName(){      return firstName;   }   public String getLastName(){      return lastName;   }   public int getAge(){      return age;   }    public void setFirstName(String firstName){      this.firstName = firstName;   }   public void setLastName(String lastName){      this.lastName = lastName;   }   public void setAge(int age) {      this.age = age;   }}
+</code></pre><h3 id="二、BeanFactory的结构"><a href="#二、BeanFactory的结构" class="headerlink" title="二、BeanFactory的结构"></a>二、BeanFactory的结构</h3><p>beanFactory及子接口的结构图：</p>
+<p><img src="https://img-blog.csdnimg.cn/20181208201738118.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hhb3hpbjk2Mw==,size_16,color_FFFFFF,t_70" alt=""></p>
+<p>看到这边,我们是不是想起了设计模式原则里的接口隔离原则</p>
+<p> Interface Segregation Principle(ISP)：客户端不应该依赖它不需要的接口；类间的依赖关系应该建立在最小的接口上</p>
+<p>这边清晰地定义了如下的体系:</p>
+<p>　　根接口BeanFactory(基础容器)</p>
+<p>　　第二层: 第三方集成,继承体系,遍历bean</p>
+<p>　　第三层: 配置功能</p>
+<p>　　第四层: 配置+迭代</p>
+<p>具体源码如下：</p>
+<p>1.BeanFactory源码，主要就是获取bean对象</p>
+<pre><code>public interface BeanFactory {     /**     * 通过名称获取bean对象     */    Object getBean(String name) throws BeansException;     /**     * 通过名称获取bean对象，并验证bean的类型     */    Object getBean(String name, Class requiredType) throws BeansException;     /**     * 是否包含改名称的bean     */    boolean containsBean(String name);     /**     * 判断是否是单列     */    boolean isSingleton(String name) throws NoSuchBeanDefinitionException;     /**     * 获取别名数组     */    String[] getAliases(String name) throws NoSuchBeanDefinitionException; }
+</code></pre><p>2.HierarchicalBeanFactory ：工厂可以分层，有父工厂</p>
+<pre><code>public interface HierarchicalBeanFactory extends BeanFactory {        /**     * 获取父级工厂     */    BeanFactory getParentBeanFactory(); }
+</code></pre><p>3.AutowireCapableBeanFactory ：是工厂可以自动装配（设置类字段的值）</p>
+<pre><code>public interface AutowireCapableBeanFactory extends BeanFactory {     /**     * 按名称装配     */    int AUTOWIRE_BY_NAME = 1;     /**     * 按类型装配     */    int AUTOWIRE_BY_TYPE = 2;     /**     * 按构造发放装配     */    int AUTOWIRE_CONSTRUCTOR = 3;     /**     * 首先会尝试使用constructor进行自动装配，如果失败再尝试使用byTypeegy     */    int AUTOWIRE_AUTODETECT = 4;      /**     * 通过自动装配实例化对象     */    Object autowire(Class beanClass, int autowireMode, boolean dependencyCheck)            throws BeansException;     /**     * 自动装配存在的对象的属性     */    void autowireBeanProperties(Object existingBean, int autowireMode, boolean dependencyCheck)            throws BeansException;     /**     * 初始化前执行的方法     */    Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String name)            throws BeansException;      /**     * 初始化后执行的方法     */    Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String name)            throws BeansException; }
+</code></pre><p>4.ListableBeanFactory：提供所有bean 实例的枚举,不再需要客户端通过一个个bean name查找.BeanFactory实现类预加载bean定义(如通过实现xml的工厂)需要实现这个接口.</p>
+<pre><code>public interface ListableBeanFactory extends BeanFactory {     /**     * 返回bean定义的数量     */    int getBeanDefinitionCount();     /**     * 返回bean定义的名称数组     */    String[] getBeanDefinitionNames();        /**     * 通过Class 返回bean定义名称数组     */    String[] getBeanDefinitionNames(Class type);     /**     * 检查时候存在改名称的bean定义     */    boolean containsBeanDefinition(String name);     /**     * 通过类型返回bean的实例     */    Map getBeansOfType(Class type, boolean includePrototypes, boolean includeFactoryBeans)        throws BeansException; }
+</code></pre><p> 5.ConfigurableBeanFactory ：是工厂可以配置</p>
+<pre><code>public interface ConfigurableBeanFactory extends HierarchicalBeanFactory {     /**     * 设置父级bean工厂     */    void setParentBeanFactory(BeanFactory parentBeanFactory);     /**     * 注册自定义属性     */    void registerCustomEditor(Class requiredType, PropertyEditor propertyEditor);     /**     * 设置自动装配忽略的Class      */    void ignoreDependencyType(Class type);     /**     * 增强bean初始化前后的操作     */    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);     /**     * 通过名称获取bean的定义     */    BeanDefinition getBeanDefinition(String beanName) throws BeansException;     /**     * 注册bean的别名     */    void registerAlias(String beanName, String alias) throws BeansException;     /**     * 注册单例     */    void registerSingleton(String beanName, Object singletonObject) throws BeansException;     /**     * 销毁单例     */    void destroySingletons(); }
+</code></pre><p>6.ConfigurableListableBeanFactory： 集大成者,并增加预加载单例的方法</p>
+<pre><code>public interface ConfigurableListableBeanFactory        extends ListableBeanFactory, ConfigurableBeanFactory, AutowireCapableBeanFactory {     /**     * 预处理单例     */    void preInstantiateSingletons(); }
+</code></pre>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">sky平台</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（四）：BeanFactory/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2019/01/14/白话Spring源码（三）：spring框架的理解/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">白话Spring源码（三）：spring框架的理解</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
   
 
     
+ 
+  
+
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://billts.site/extra_css/gitment.css">
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2019/01/14/白话Spring源码（四）：BeanFactory/",
+  owner: 'haoxin963',
+  repo: 'haoxin963.github.io',
+  oauth: {
+    client_id: '122ffb2d712f40efbf52',
+    client_secret: '0ee50381131e30c83fab491ee728542fac43cef4',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -219,9 +387,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
