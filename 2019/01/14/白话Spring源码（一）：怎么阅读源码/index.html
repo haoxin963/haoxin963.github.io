@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: sky平台 | haoxin963的博客</title>
+  <title>白话Spring源码（一）：怎么阅读源码 | haoxin963的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="haoxin963的博客">
-<meta property="og:url" content="http://yoursite.com/tags/sky平台/index.html">
+  <meta name="description" content="跟大家分享Spring源码前我想先聊聊： 为什么要阅读源码？ 怎么阅读源码？ 希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。 一、为什么要阅读源码刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东">
+<meta name="keywords" content="spring源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="白话Spring源码（一）：怎么阅读源码">
+<meta property="og:url" content="http://yoursite.com/2019/01/14/白话Spring源码（一）：怎么阅读源码/index.html">
 <meta property="og:site_name" content="haoxin963的博客">
+<meta property="og:description" content="跟大家分享Spring源码前我想先聊聊： 为什么要阅读源码？ 怎么阅读源码？ 希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。 一、为什么要阅读源码刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东">
+<meta property="og:updated_time" content="2019-01-14T05:53:26.821Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="haoxin963的博客">
+<meta name="twitter:title" content="白话Spring源码（一）：怎么阅读源码">
+<meta name="twitter:description" content="跟大家分享Spring源码前我想先聊聊： 为什么要阅读源码？ 怎么阅读源码？ 希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。 一、为什么要阅读源码刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东">
   
     <link rel="alternative" href="/atom.xml" title="haoxin963的博客" type="application/atom+xml">
   
@@ -143,60 +148,197 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-白话Spring源码（一）：怎么阅读源码" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/14/sky微服务接口平台上线/" class="archive-article-date">
-  	<time datetime="2019-01-14T05:25:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/14/sky微服务接口平台上线/">sky平台</a>
+    <h1 class="article-title" itemprop="name">
+      白话Spring源码（一）：怎么阅读源码
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/" class="archive-article-date">
+  	<time datetime="2019-01-14T05:48:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>跟大家分享Spring源码前我想先聊聊：</p>
+<p>为什么要阅读源码？</p>
+<p>怎么阅读源码？</p>
+<p>希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。</p>
+<h3 id="一、为什么要阅读源码"><a href="#一、为什么要阅读源码" class="headerlink" title="一、为什么要阅读源码"></a>一、为什么要阅读源码</h3><p>刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东西也很少，而且现在框架也越来越强大，甚至配置文件都不需要，这样我们跟刚入行的小白比技术上又有多大优势呢？</p>
+<p>其实阅读源码是提升我们技术的一大法宝，我们知道源码都是一些大师级的人写的，无论是他们对问题的抽象，代码的规范，设计模式的运用等都是教科书级的，我们可以从源码中学到他们是怎么思考问题，怎么去抽象，怎么去设计接口，怎么像写诗一样写代码等等，然后我们试着的学以致用，技术自然就提高了。</p>
+<h3 id="二、怎么阅读源码"><a href="#二、怎么阅读源码" class="headerlink" title="二、怎么阅读源码"></a>二、怎么阅读源码</h3><p>我相信大家刚接触源码是肯定有这种感觉：哇！这代码量太大了吧,这调用层次太深了吧，这从哪开始读啊。。。。</p>
+<p>其实我也困惑也很多，其实阅读源码也需要一些技巧的，下面跟大家分享一下：</p>
+<p>1.先会使用他，越熟悉越好，如果都不知道它干嘛的，你读什么源码呀</p>
+<p>2.对框架里的架构和概念有一些了解，这网上一堆，但是很多概念都很难理解，其实这是都是商业宣传搞的鬼，不吹会死啊</p>
+<p>3.能到程序的入口或者带着问题去阅读，其实源码都是有junit的测试用例的，这是很好的入口噢</p>
+<p>4.最好阅读最初的版本，因为刚开始版本的都是精华，代码量很少，以后的版本大都是丰富功能，增加稳定性，但是万变不离其宗，我们知道了核心的思想，阅读以后的版本也就很轻松了。</p>
+<p>5.分享，分享对学习的动力，与他人分享也能发挥我们的价值。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">sky平台</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/01/14/白话Spring源码（一）：怎么阅读源码/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2019/01/14/sky微服务接口平台上线/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">sky平台</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
   
 
     
+ 
+  
+
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://billts.site/extra_css/gitment.css">
+<script src="https://billts.site/js/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2019/01/14/白话Spring源码（一）：怎么阅读源码/",
+  owner: 'haoxin963',
+  repo: 'haoxin963.github.io',
+  oauth: {
+    client_id: '122ffb2d712f40efbf52',
+    client_secret: '0ee50381131e30c83fab491ee728542fac43cef4',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -219,9 +361,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

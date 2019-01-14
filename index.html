@@ -145,6 +145,92 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-白话Spring源码（一）：怎么阅读源码" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/">白话Spring源码（一）：怎么阅读源码</a>
+    </h1>
+  
+
+        
+        <a href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/" class="archive-article-date">
+  	<time datetime="2019-01-14T05:48:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>跟大家分享Spring源码前我想先聊聊：</p>
+<p>为什么要阅读源码？</p>
+<p>怎么阅读源码？</p>
+<p>希望大家在学习某个新的知识前多问几个为什么，好奇心是我们学习的一大动力。</p>
+<h3 id="一、为什么要阅读源码"><a href="#一、为什么要阅读源码" class="headerlink" title="一、为什么要阅读源码"></a>一、为什么要阅读源码</h3><p>刚入行时，我们会接触很多框架：spirng，Struts，Hibernate，mybatis等等，我们只要在这些框架上做业务功能的开发，了解一些配置，那时自己能从零搭一个框架都感觉很不错。但工作几年后，工作变得很枯燥，能学到的东西也很少，而且现在框架也越来越强大，甚至配置文件都不需要，这样我们跟刚入行的小白比技术上又有多大优势呢？</p>
+<p>其实阅读源码是提升我们技术的一大法宝，我们知道源码都是一些大师级的人写的，无论是他们对问题的抽象，代码的规范，设计模式的运用等都是教科书级的，我们可以从源码中学到他们是怎么思考问题，怎么去抽象，怎么去设计接口，怎么像写诗一样写代码等等，然后我们试着的学以致用，技术自然就提高了。</p>
+<h3 id="二、怎么阅读源码"><a href="#二、怎么阅读源码" class="headerlink" title="二、怎么阅读源码"></a>二、怎么阅读源码</h3><p>我相信大家刚接触源码是肯定有这种感觉：哇！这代码量太大了吧,这调用层次太深了吧，这从哪开始读啊。。。。</p>
+<p>其实我也困惑也很多，其实阅读源码也需要一些技巧的，下面跟大家分享一下：</p>
+<p>1.先会使用他，越熟悉越好，如果都不知道它干嘛的，你读什么源码呀</p>
+<p>2.对框架里的架构和概念有一些了解，这网上一堆，但是很多概念都很难理解，其实这是都是商业宣传搞的鬼，不吹会死啊</p>
+<p>3.能到程序的入口或者带着问题去阅读，其实源码都是有junit的测试用例的，这是很好的入口噢</p>
+<p>4.最好阅读最初的版本，因为刚开始版本的都是精华，代码量很少，以后的版本大都是丰富功能，增加稳定性，但是万变不离其宗，我们知道了核心的思想，阅读以后的版本也就很轻松了。</p>
+<p>5.分享，分享对学习的动力，与他人分享也能发挥我们的价值。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">spring源码</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/01/14/白话Spring源码（一）：怎么阅读源码/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-sky微服务接口平台上线" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -166,7 +252,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>sky平台是基于spring cloud的微服务接口开发平台，平台的目标是在高并发，大数据场景下支持水平扩展和服务高可靠，高可用。</p>
-<p>平台包含API网关、统一权限认证、前后端代码生成，数据上传分库分表等多个模块，可以作为后端接口的开发<a href="https://www.baidu.com/s?wd=%E8%84%9A%E6%89%8B%E6%9E%B6&amp;tn=24004469_oem_dg&amp;rsv_dl=gh_pl_sl_csd" target="_blank" rel="noopener">脚手架</a>或微服务学习入门框架。</p>
+<p>平台包含API网关、统一权限认证、前后端代码生成，数据上传分库分表等多个模块，可以作为后端接口的开发脚手架或微服务学习入门框架。</p>
 <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><ul>
 <li>如果对您对此项目有兴趣，可以点 “Star” 支持一下 谢谢！ ^_^</li>
 <li>或者您可以 “follow” 一下，我会不断开源更多的有趣的项目</li>
@@ -395,6 +481,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">sky平台</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">spring源码</a>
               </li>
             
             <div class="clearfix"></div>
